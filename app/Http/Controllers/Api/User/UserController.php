@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\User;
 
 use App\Traits\ApiTrait;
 use App\Http\Controllers\Controller;
@@ -8,6 +8,7 @@ use App\Http\Requests\Api\User\EditUserRequest;
 use App\Http\Requests\Api\User\NewUserRequest;
 use App\Http\Requests\Api\User\LoginRequest;
 use App\Http\Resources\User\UserResource;
+use App\Jobs\VerifyMailJob;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -32,8 +33,16 @@ class UserController extends Controller
 
     public function store(NewUserRequest $request)
     {
+
         try {
-            $user = User::create($request->validated());
+
+            $validatedData = $request->validated();
+            $code = $this->generateUniqueRandomNumber(20);
+            $validatedData = array_merge($validatedData, ['code' => $code]);
+
+            $user = User::create($validatedData);
+
+            VerifyMailJob::dispatchSync($code, $request->get('email'));
 
             $token = $user->createToken('myApp')->plainTextToken;
 
@@ -80,7 +89,7 @@ class UserController extends Controller
                 auth()->user()->update([
                     'name' => $request->get('name'),
                     'email' => $request->get('email'),
-                    'password' => Hash::make($request->get('name')),
+                    'password' => Hash::make($request->get('password')),
                 ]);
             } else {
                 auth()->user()->update($request->validated());
@@ -125,5 +134,14 @@ class UserController extends Controller
             'error' => 0,
             'message' => 'User was  logged out successfully'
         ], Response::HTTP_OK);
+    }
+
+    function generateUniqueRandomNumber($length)
+    {
+        $number = '';
+        do {
+            $number = str_pad(random_int(0, (int)pow(10, $length) - 1), $length, '0', STR_PAD_LEFT);
+        } while (User::where('code', $number)->exists());
+        return $number;
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\User\UserVeriyController;
+use App\Http\Controllers\Api\User\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -12,7 +13,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 Route::middleware('apiMiddleware')->group(function () {
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['auth:sanctum','checVerifyUserApi'])->group(function () {
         //need to auth for these routes
         Route::controller(UserController::class)->group(function () {
             Route::delete('users',  'destroy');
@@ -22,6 +23,8 @@ Route::middleware('apiMiddleware')->group(function () {
         });
     });
 
+
+    Route::get('user/verify/{code}',UserVeriyController::class);
     Route::post('users', [UserController::class, 'store']);
     Route::post('user/login', [UserController::class, 'login']);
 });
