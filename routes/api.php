@@ -20,6 +20,7 @@ Route::middleware('apiMiddleware')->group(function () {
             Route::get('user/info', 'userInfo');
             Route::put('users', 'update');
             Route::post('user/logout', 'logout');
+            Route::post('user/upload/profile/image', 'uploadImage');
         });
     });
 

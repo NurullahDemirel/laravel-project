@@ -7,17 +7,21 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\User\EditUserRequest;
 use App\Http\Requests\Api\User\NewUserRequest;
 use App\Http\Requests\Api\User\LoginRequest;
+use App\Http\Requests\User\ProfileUplaodImageRequest;
 use App\Http\Resources\User\UserResource;
 use App\Jobs\VerifyMailJob;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class UserController extends Controller
 {
     use ApiTrait;
+
+    const AWS_PROFILE_IMAGES_PATH = '/User/Profile/';
 
     public function userInfo()
     {
@@ -136,12 +140,44 @@ class UserController extends Controller
         ], Response::HTTP_OK);
     }
 
-    function generateUniqueRandomNumber($length)
+    public function uploadImage(ProfileUplaodImageRequest $request){
+        try {
+            $file = $request->file('profile_image');
+            $imageName = $this->createProfileImageName().'.'.$request->profile_image->extension();
+
+            $libraryModel =  auth()->user()->addMediaFromRequest('profile_image',$imageName)
+            ->usingFileName($imageName)
+            ->toMediaCollection('profile');
+
+            if($libraryModel instanceof Media){
+                return response()->json([
+                    'error' => 0,
+                   'message' => 'Image was uploaded successfully'
+                ], Response::HTTP_OK);
+            }
+            else{
+                return response()->json([
+                    'error' => 1,
+                   'message' => 'Something went wrong when uploading image to aws'
+                ], Response::HTTP_OK);
+            }
+
+        } catch (\Exception $exception) {
+            return $this->exceptionResponse($exception);
+        }
+    }
+
+
+    public function generateUniqueRandomNumber($length)
     {
         $number = '';
         do {
             $number = str_pad(random_int(0, (int)pow(10, $length) - 1), $length, '0', STR_PAD_LEFT);
         } while (User::where('code', $number)->exists());
         return $number;
+    }
+
+    public function createProfileImageName (){
+        return  str_replace('-','_',Str::slug(auth()->user()->name)) . '_' . auth()->id();
     }
 }
