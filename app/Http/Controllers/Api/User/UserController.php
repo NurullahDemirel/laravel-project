@@ -26,10 +26,7 @@ class UserController extends Controller
     public function userInfo()
     {
         try {
-            return response()->json([
-                'error' => 0,
-                'data' => new UserResource(auth()->user()),
-            ], Response::HTTP_OK);
+            return  $this->apiSuccessResponse(new UserResource(auth()->user()));
         } catch (\Exception $exception) {
             return $this->exceptionResponse($exception);
         }
@@ -41,6 +38,7 @@ class UserController extends Controller
         try {
 
             $validatedData = $request->validated();
+            $validatedData['password'] = Hash::make($validatedData['password']);
             $code = $this->generateUniqueRandomNumber(20);
             $validatedData = array_merge($validatedData, ['code' => $code]);
 
@@ -48,13 +46,14 @@ class UserController extends Controller
 
             VerifyMailJob::dispatchSync($code, $request->get('email'));
 
+
             $token = $user->createToken('myApp')->plainTextToken;
 
-            return response()->json([
-                'error' => 0,
-                'data' => new UserResource($user),
-                'token' => $token
-            ], Response::HTTP_CREATED);
+            return $this->apiSuccessResponse(
+                new UserResource($user),
+                Response::HTTP_CREATED,
+                ['vertify_message' => 'Please check email for vertify your emial', 'token' => $token]
+            );
         } catch (\Exception $exception) {
             return $this->exceptionResponse($exception);
         }
@@ -67,11 +66,7 @@ class UserController extends Controller
                 $user = Auth::user();
                 $token =  $user->createToken('myApp')->plainTextToken;
 
-                return response()->json([
-                    'error' => 0,
-                    'data' => new UserResource($user),
-                    'token' => $token
-                ], Response::HTTP_CREATED);
+                return $this->apiSuccessResponse(new UserResource($user), Response::HTTP_OK, ['token' => $token]);
             } else {
                 return response()->json([
                     'error' => 1,
@@ -88,6 +83,7 @@ class UserController extends Controller
     {
 
         $hasPasspword =  $request->has('password');
+
         try {
             if ($hasPasspword) {
                 auth()->user()->update([
@@ -101,15 +97,11 @@ class UserController extends Controller
 
             $updatedUser = User::find(auth()->id());
 
-            $responseData = [
-                'error' => 0,
-                'data' => new UserResource($updatedUser)
-            ];
-            if ($hasPasspword) {
-                $responseData['passwordMessage'] = 'Your Password was updated successfully';
-            }
-
-            return response()->json($responseData, Response::HTTP_OK);
+            return $this->apiSuccessResponse(
+                new UserResource($updatedUser),
+                Response::HTTP_OK,
+                $hasPasspword  ? ['passwordMessage' => 'Your Password was updated successfully'] : []
+            );
         } catch (\Exception $exception) {
             return $this->exceptionResponse($exception);
         }
@@ -140,28 +132,27 @@ class UserController extends Controller
         ], Response::HTTP_OK);
     }
 
-    public function uploadImage(ProfileUplaodImageRequest $request){
+    public function uploadImage(ProfileUplaodImageRequest $request)
+    {
         try {
             $file = $request->file('profile_image');
-            $imageName = $this->createProfileImageName().'.'.$request->profile_image->extension();
+            $imageName = $this->createProfileImageName() . '.' . $request->profile_image->extension();
 
-            $libraryModel =  auth()->user()->addMediaFromRequest('profile_image',$imageName)
-            ->usingFileName($imageName)
-            ->toMediaCollection('profile');
+            $libraryModel =  auth()->user()->addMediaFromRequest('profile_image', $imageName)
+                ->usingFileName($imageName)
+                ->toMediaCollection('profile');
 
-            if($libraryModel instanceof Media){
+            if ($libraryModel instanceof Media) {
                 return response()->json([
                     'error' => 0,
-                   'message' => 'Image was uploaded successfully'
+                    'message' => 'Image was uploaded successfully'
                 ], Response::HTTP_OK);
-            }
-            else{
+            } else {
                 return response()->json([
                     'error' => 1,
-                   'message' => 'Something went wrong when uploading image to aws'
+                    'message' => 'Something went wrong when uploading image to aws'
                 ], Response::HTTP_OK);
             }
-
         } catch (\Exception $exception) {
             return $this->exceptionResponse($exception);
         }
@@ -177,7 +168,8 @@ class UserController extends Controller
         return $number;
     }
 
-    public function createProfileImageName (){
-        return  str_replace('-','_',Str::slug(auth()->user()->name)) . '_' . auth()->id();
+    public function createProfileImageName()
+    {
+        return  str_replace('-', '_', Str::slug(auth()->user()->name)) . '_' . auth()->id();
     }
 }

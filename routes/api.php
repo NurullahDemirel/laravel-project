@@ -13,7 +13,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 Route::middleware('apiMiddleware')->group(function () {
-    Route::middleware(['auth:sanctum','checVerifyUserApi'])->group(function () {
+    Route::middleware(['auth:sanctum','checkVerifyUserApi'])->group(function () {
         //need to auth for these routes
         Route::controller(UserController::class)->group(function () {
             Route::delete('users',  'destroy');
@@ -25,7 +25,7 @@ Route::middleware('apiMiddleware')->group(function () {
     });
 
 
-    Route::get('user/verify/{code}',UserVeriyController::class);
+    Route::get('user/verify/{code}',UserVeriyController::class)->name('verify.user');
     Route::post('users', [UserController::class, 'store']);
     Route::post('user/login', [UserController::class, 'login']);
 });

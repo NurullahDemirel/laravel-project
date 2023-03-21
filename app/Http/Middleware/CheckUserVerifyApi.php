@@ -17,7 +17,6 @@ class CheckUserVerifyApi
      */
     public function handle(Request $request, Closure $next): Response
     {
-
         if (
             !$request->user() ||
             ($request->user() instanceof MustVerifyEmail &&
