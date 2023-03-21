@@ -1,5 +1,8 @@
 <?php
 
+use App\Services\MediaLibrary\CustomPathGenerator;
+use App\Models\User;
+
 return [
 
     /*
@@ -72,6 +75,7 @@ return [
         // Model::class => PathGenerator::class
         // or
         // 'model_morph_alias' => PathGenerator::class
+        User::class => CustomPathGenerator::class
     ],
 
     /*

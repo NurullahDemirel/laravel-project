@@ -135,7 +135,6 @@ class UserController extends Controller
     public function uploadImage(ProfileUplaodImageRequest $request)
     {
         try {
-            $file = $request->file('profile_image');
             $imageName = $this->createProfileImageName() . '.' . $request->profile_image->extension();
 
             $libraryModel =  auth()->user()->addMediaFromRequest('profile_image', $imageName)

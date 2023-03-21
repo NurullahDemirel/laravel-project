@@ -16,6 +16,8 @@ class User extends Authenticatable implements HasMedia,MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable,InteractsWithMedia;
 
+    const AWS_PROFILE_IMAGES_PATH = 'User/Profile/';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -46,4 +48,10 @@ class User extends Authenticatable implements HasMedia,MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('profile')
+            ->singleFile();
+    }
 }
