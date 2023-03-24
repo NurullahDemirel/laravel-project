@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Requests\User;
+namespace App\Http\Requests\Api\Post;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class ProfileUplaodImageRequest extends FormRequest
+class UpdatePostRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,9 +22,9 @@ class ProfileUplaodImageRequest extends FormRequest
      */
     public function rules(): array
     {
-        // 'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048|dimensions:width=500,height=500']);
         return [
-            'profile_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+            'title' => Rule::when($this->has('title'),'required|min:5'),
+            'description' => Rule::when($this->has('description'),'required|min:5'),
         ];
     }
 }

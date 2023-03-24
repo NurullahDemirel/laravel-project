@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\User;
+namespace App\Http\Resources\Api\User;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -18,7 +18,7 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
-            'prrofileImage' => $this->getFirstMedia('profile')->getFullUrl() ?? ''
+            'profile_image' => $this->getFirstMedia('profile') ?  $this->getFirstMedia('profile')->getFullUrl() : ''
         ];
     }
 }

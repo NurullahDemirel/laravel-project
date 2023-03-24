@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Api\Comment\CommentController;
+use App\Http\Controllers\Api\Like\LikeController;
+use App\Http\Controllers\Api\Post\PostController;
 use App\Http\Controllers\Api\User\UserVeriyController;
 use App\Http\Controllers\Api\User\UserController;
 use Illuminate\Http\Request;
@@ -13,6 +16,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 Route::middleware('apiMiddleware')->group(function () {
+
+    Route::get('user/verify/{code}',UserVeriyController::class)->name('verify.user');
+    Route::post('users', [UserController::class, 'store']);
+    Route::post('user/login', [UserController::class, 'login']);
+
     Route::middleware(['auth:sanctum','checkVerifyUserApi'])->group(function () {
         //need to auth for these routes
         Route::controller(UserController::class)->group(function () {
@@ -22,10 +30,12 @@ Route::middleware('apiMiddleware')->group(function () {
             Route::post('user/logout', 'logout');
             Route::post('user/upload/profile/image', 'uploadImage');
         });
+        Route::apiResource('posts',PostController::class);
+        Route::apiResource('comments',CommentController::class);
+
+        Route::controller(LikeController::class)->group(function(){
+            Route::post('like/{likeableType}','likeOrDislike');
+
+        });
     });
-
-
-    Route::get('user/verify/{code}',UserVeriyController::class)->name('verify.user');
-    Route::post('users', [UserController::class, 'store']);
-    Route::post('user/login', [UserController::class, 'login']);
 });
