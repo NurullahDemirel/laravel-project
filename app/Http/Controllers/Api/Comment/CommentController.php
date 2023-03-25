@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Comment\StoreCommentRequest;
 use App\Http\Resources\Api\Comment\CommentResource;
 use App\Models\Comment;
+use App\Models\Like;
 use App\Traits\ApiTrait;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -71,7 +72,14 @@ class CommentController extends Controller
     public function destroy(Comment $comment)
     {
         try {
+
+            //delete likes for related with the comment
+            //cascade on delete dont work with polimorpich relation ships
+            //we have to delete like this for provading the DB normalization
+
+            Like::getByType(Comment::class)->getByLikeableId($comment->id)->delete();
             $comment->delete();
+
 
             return $this->apiSuccessResponse(['message' => "Successfully deleted"]);
         } catch (\Exception $e) {

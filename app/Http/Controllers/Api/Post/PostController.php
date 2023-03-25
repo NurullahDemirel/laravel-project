@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers\Api\Post;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\Like\LikeRequest;
-use App\Http\Requests\Api\Post\StorePostRequest;
-use App\Http\Requests\Api\Post\UpdatePostRequest;
-use App\Http\Resources\Api\Post\PostResource;
+use App\Models\Like;
 use App\Models\Post;
 use App\Traits\ApiTrait;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\Post\PostResource;
+use App\Http\Requests\Api\Post\StorePostRequest;
+use App\Http\Requests\Api\Post\UpdatePostRequest;
 
 class PostController extends Controller
 {
@@ -76,6 +75,11 @@ class PostController extends Controller
     public function destroy(Post $post)
     {
         try {
+            //delete likes for related with the posts
+            //cascade on delete dont work with polimorpich relation ships
+            //we have to delete like this for provading the DB normalization
+
+            Like::getByType(Post::class)->getByLikeableId($post->id)->delete();
             $post->delete();
             return $this->apiSuccessResponse(['message' => "Successfully deleted"]);
         } catch (\Exception $e) {

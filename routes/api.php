@@ -5,16 +5,9 @@ use App\Http\Controllers\Api\Like\LikeController;
 use App\Http\Controllers\Api\Post\PostController;
 use App\Http\Controllers\Api\User\UserVeriyController;
 use App\Http\Controllers\Api\User\UserController;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
-
 Route::middleware('apiMiddleware')->group(function () {
 
     Route::get('user/verify/{code}',UserVeriyController::class)->name('verify.user');
@@ -39,3 +32,7 @@ Route::middleware('apiMiddleware')->group(function () {
         });
     });
 });
+
+
+//this route adde by testing some proccess in order to be sure , it should be delete end of the project
+Route::get('test',[Controller::class,'test']);
