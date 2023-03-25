@@ -18,5 +18,5 @@ yarn-error.log
 /.idea
 /.vscode
 
-_ide_helper
-_ide_helper_models
+# _ide_helper
+# _ide_helper_models
