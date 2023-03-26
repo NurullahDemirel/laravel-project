@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Post\PostResource;
 use App\Http\Requests\Api\Post\StorePostRequest;
 use App\Http\Requests\Api\Post\UpdatePostRequest;
+use Illuminate\Support\Facades\DB;
 
 class PostController extends Controller
 {
@@ -19,8 +20,9 @@ class PostController extends Controller
      */
     public function index()
     {
+        $posts = Post::myPosts()->with(['likes','comments'])->get();
         try {
-            return $this->apiSuccessResponse(PostResource::collection(auth()->user()->posts()));
+            return $this->apiSuccessResponse(PostResource::collection($posts));
         } catch (\Exception $e) {
             return $this->exceptionResponse($e);
         }
@@ -43,9 +45,14 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Post $post)
+    public function show($postId)
     {
         try {
+            $post = Post::with(['comments.user','user'])->find($postId);
+
+            if(!$post)
+                return $this->apiErrorResponse('Post not found',Response::HTTP_NOT_FOUND);
+
             return $this->apiSuccessResponse(new PostResource($post));
         } catch (\Exception $e) {
             return $this->exceptionResponse($e);
@@ -79,11 +86,24 @@ class PostController extends Controller
             //cascade on delete dont work with polimorpich relation ships
             //we have to delete like this for provading the DB normalization
 
-            Like::getByType(Post::class)->getByLikeableId($post->id)->delete();
-            $post->delete();
+            DB::transaction(function () use ($post) {
+                Like::getByType(Post::class)->getByLikeableId($post->id)->delete();
+                $post->delete();
+            });
             return $this->apiSuccessResponse(['message' => "Successfully deleted"]);
         } catch (\Exception $e) {
             return $this->exceptionResponse($e);
         }
     }
+
+    public function allPosts()
+    {
+        try {
+            $posts = Post::with('comments','user');
+            return $this->apiSuccessResponse(Post::all());
+        } catch (\Exception $e) {
+            return $this->exceptionResponse($e);
+        }
+    }
+
 }

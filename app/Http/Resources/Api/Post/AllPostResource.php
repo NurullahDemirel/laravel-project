@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Resources\Api\Post;
+namespace App\Http\Resources\Api\Psot;
 
-use App\Http\Resources\Api\Comment\CommentResource;
 use Illuminate\Http\Request;
-use App\Http\Resources\Api\User\UserResource;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\Api\Comment\CommentResource;
+use App\Http\Resources\Api\User\UserResource;
 
-class PostResource extends JsonResource
+class AllPostResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -21,6 +21,7 @@ class PostResource extends JsonResource
             'title' => $this->title,
             'descirption' => $this->description,
             'is_liked' => $this->resource->is_liked,
+            'user' =>new UserResource(auth()->user()),
             'comments' =>CommentResource::collection($this->comments)
         ];
     }

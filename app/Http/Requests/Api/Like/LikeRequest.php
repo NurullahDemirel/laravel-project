@@ -27,7 +27,7 @@ class LikeRequest extends FormRequest
         return [
             'post_id' => Rule::when($this->has('post_id'),'required|exists:posts,id'),
             'comment_id' => Rule::when($this->has('comment_id'),'required|exists:comments,id'),
-            'action_type' => ['required',new Enum(LikeActions::class)]
+            // 'action_type' => ['required',new Enum(LikeActions::class)]
         ];
     }
 }

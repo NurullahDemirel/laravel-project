@@ -10,6 +10,7 @@ use App\Models\Like;
 use App\Traits\ApiTrait;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 
 class CommentController extends Controller
 {
@@ -19,8 +20,10 @@ class CommentController extends Controller
      */
     public function index()
     {
+
         try {
-            return $this->apiSuccessResponse(CommentResource::collection(auth()->user()->comments()));
+            $comments = Comment::myComments()->with(['post', 'likes'])->get();
+            return $this->apiSuccessResponse(CommentResource::collection($comments));
         } catch (\Exception $e) {
             return $this->exceptionResponse($e);
         }
@@ -32,9 +35,9 @@ class CommentController extends Controller
     public function store(StoreCommentRequest $request)
     {
         try {
-            $comment = auth()->user()->comments()->create($request->validated());
+            $comment = Comment::myComments()->create($request->validated());
 
-            return $this->apiSuccessResponse(new CommentResource($comment),Response::HTTP_CREATED);
+            return $this->apiSuccessResponse(new CommentResource($comment), Response::HTTP_CREATED);
         } catch (\Exception $e) {
             return $this->exceptionResponse($e);
         }
@@ -46,7 +49,7 @@ class CommentController extends Controller
     public function show(Comment $comment)
     {
         try {
-            return $this->apiSuccessResponse (new CommentResource($comment));
+            return $this->apiSuccessResponse(new CommentResource($comment));
         } catch (\Exception $e) {
             return $this->exceptionResponse($e);
         }
@@ -77,8 +80,10 @@ class CommentController extends Controller
             //cascade on delete dont work with polimorpich relation ships
             //we have to delete like this for provading the DB normalization
 
-            Like::getByType(Comment::class)->getByLikeableId($comment->id)->delete();
-            $comment->delete();
+            DB::transaction(function () use ($comment) {
+                Like::getByType(Comment::class)->getByLikeableId($comment->id)->delete();
+                $comment->delete();
+            });
 
 
             return $this->apiSuccessResponse(['message' => "Successfully deleted"]);

@@ -17,7 +17,7 @@ class CommentResource extends JsonResource
     {
         return [
             'content' => $this->content,
-            'created_by' => new UserResource($this->user),
+            'is_liked' => $this->resource->is_liked,
             'replies' => self::collection($this->replies),
             'created_at' => $this->created_at->diffForHumans(),
             'updated_at' => $this->created_at->diffForHumans(),

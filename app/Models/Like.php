@@ -17,6 +17,8 @@ class Like extends Model
     public const LIKEABLE_TYPE_POST = 'post';
     public const LIKEABLE_TYPES = [self::LIKEABLE_TYPE_COMMENT, self::LIKEABLE_TYPE_POST];
 
+    protected $appends = ['is_liked'];
+
 
     public function commentable()
     {
@@ -31,5 +33,14 @@ class Like extends Model
     public function scopeGetByLikeableId(Builder $query, $id)
     {
         return $query->where('likeable_id', $id);
+    }
+
+    public function likes()
+    {
+        return $this->morphMany(Like::class, 'likeable');
+    }
+
+    public function getIsLikedAttribute(){
+        return $this->likes->contains('user_id',auth()->id()) ? 1 : 0;
     }
 }

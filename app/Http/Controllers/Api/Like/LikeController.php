@@ -19,44 +19,50 @@ class LikeController extends Controller
     {
         try {
 
-            if (!in_array($likeableType, Like::LIKEABLE_TYPES)) {
-                return $this->apiErrorResponse('This type not valid for liking.');
-            }
+        if (!in_array($likeableType, Like::LIKEABLE_TYPES)) {
+            return $this->apiErrorResponse('This type not valid to like or dislike.');
+        }
 
+        if (($likeableType == Like::LIKEABLE_TYPE_POST) && ($this->checkRequestKey('post_id', $request))) {
+            $postId = $request->get('post_id');
 
-            if (($likeableType == Like::LIKEABLE_TYPE_POST) && ($this->checkRequestKey('post_id', $request))) {
+            $post = Post::with('likes')->find($postId);
 
-              if($request->get('action_type') == LikeActions::LIKE){
-                $post = Post::find($request->get('post_id'));
+            $like = $post->likes->where('user_id', auth()->id())->first();
 
-                $like = $post->likes()->create([
+            if (!$like) {
+                $post->likes()->create([
                     'user_id' => auth()->id(),
                 ]);
-              }
-              else{
-
-                //todo delete like
-              }
-
+            } else {
+                $like->delete();
             }
+        }
 
 
-            if (($likeableType == Like::LIKEABLE_TYPE_COMMENT) && ($this->checkRequestKey('comment_id', $request))) {
-                if($request->get('action_type') == LikeActions::LIKE){
+        if (($likeableType == Like::LIKEABLE_TYPE_COMMENT) && ($this->checkRequestKey('comment_id', $request))) {
+            $commentId = $request->get('comment_id');
 
-                $comment = Comment::find($request->get('comment_id'));
 
-                $like = $comment->likes()->create([
+
+            $comment = Comment::with('likes')->find($commentId);
+
+            $like = $comment->likes->where('user_id', auth()->user)->first();
+
+            if (!$like) {
+                $comment->likes()->create([
                     'user_id' => auth()->id(),
                 ]);
-                }
-                else{
-                    //tod delete
-                }
+            } else {
+                auth()->user()->likes()->getByType(Comment::class)->getByLikeableId($commentId)->delete();
             }
+        }
 
 
-            return $this->apiSuccessResponse(['message' => "Successfully ${likeableType} liked"]);
+
+        $process =  is_null($like ) == LikeActions::LIKE->value ? 'liked' : 'disliked';
+
+        return $this->apiSuccessResponse(['message' => "Successfully ${likeableType} ${process}"]);
         } catch (\Exception $e) {
             return $this->exceptionResponse($e);
         }

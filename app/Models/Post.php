@@ -2,14 +2,22 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Post extends Model
 {
     use HasFactory;
 
     protected $guarded = [];
+
+    protected $appends = ['is_liked'];
+
+    public function scopeMyPosts(Builder $query){
+        return $query->where('user_id',auth()->id());
+    }
 
     public function user()
     {
@@ -24,5 +32,9 @@ class Post extends Model
     public function likes()
     {
         return $this->morphMany(Like::class, 'likeable');
+    }
+
+    public function getIsLikedAttribute(){
+        return $this->likes->contains('user_id',auth()->id()) ? 1 : 0;
     }
 }
