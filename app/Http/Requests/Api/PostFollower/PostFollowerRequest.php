@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Api\User;
+namespace App\Http\Requests\Api\PostFollower;
 
 use App\Traits\ApiTrait;
-use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
-class NewUserRequest extends FormRequest
+use Illuminate\Contracts\Validation\Validator;
+
+class PostFollowerRequest extends FormRequest
 {
     use ApiTrait;
     /**
@@ -13,7 +14,7 @@ class NewUserRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return !is_null(auth()->user());
     }
 
     /**
@@ -24,13 +25,9 @@ class NewUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required',
-            'repeat_password' => 'required|same:password',
+            'post_id' => 'required|exists:posts,id'
         ];
     }
-
 
     public function failedValidation(Validator $validator)
     {

@@ -4,6 +4,8 @@ namespace App\Traits;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Contracts\Validation\Validator;
 
 trait ApiTrait
 {
@@ -12,6 +14,7 @@ trait ApiTrait
         $response = [
             'error' => 1,
             'message' => $exception->getMessage(),
+            'line' => $exception->getLine(),
             'code' => $exception->getCode()
         ];
         return response()->json($response, Response::HTTP_UNPROCESSABLE_ENTITY);
@@ -41,5 +44,12 @@ trait ApiTrait
             return $this->apiErrorResponse("{key} is required field for this request");
         }
         return true;
+    }
+
+    public function apiRequestError(Validator $validator){
+        throw new HttpResponseException(response()->json([
+            'error' => true,
+            'errors' => $validator->errors()
+        ], Response::HTTP_UNPROCESSABLE_ENTITY));
     }
 }

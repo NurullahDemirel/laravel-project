@@ -35,7 +35,7 @@ class CommentController extends Controller
     public function store(StoreCommentRequest $request)
     {
         try {
-            $comment = Comment::myComments()->create($request->validated());
+            $comment = auth()->user()->comments()->create($request->validated())->with('post.followerUsers');
 
             return $this->apiSuccessResponse(new CommentResource($comment), Response::HTTP_CREATED);
         } catch (\Exception $e) {

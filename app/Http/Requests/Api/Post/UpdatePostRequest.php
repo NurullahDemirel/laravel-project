@@ -2,11 +2,14 @@
 
 namespace App\Http\Requests\Api\Post;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Traits\ApiTrait;
 use Illuminate\Validation\Rule;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
 
 class UpdatePostRequest extends FormRequest
 {
+    use ApiTrait;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -26,5 +29,9 @@ class UpdatePostRequest extends FormRequest
             'title' => Rule::when($this->has('title'),'required|min:5'),
             'description' => Rule::when($this->has('description'),'required|min:5'),
         ];
+    }
+    public function failedValidation(Validator $validator)
+    {
+        return $this->apiRequestError($validator);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\User;
 
+use App\Traits\ApiTrait;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;
@@ -9,6 +10,7 @@ use Illuminate\Http\Response;
 
 class LoginRequest extends FormRequest
 {
+    use ApiTrait;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -33,10 +35,6 @@ class LoginRequest extends FormRequest
 
     public function failedValidation(Validator $validator)
     {
-        throw new HttpResponseException(response()->json([
-            'error' => true,
-            'errors' => $validator->errors()
-        ], Response::HTTP_UNPROCESSABLE_ENTITY));
-
+        return $this->apiRequestError($validator);
     }
 }

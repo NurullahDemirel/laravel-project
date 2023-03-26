@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\Api\User;
 
+use App\Traits\ApiTrait;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
 
 class ProfileUplaodImageRequest extends FormRequest
 {
+    use ApiTrait;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -25,5 +28,10 @@ class ProfileUplaodImageRequest extends FormRequest
         return [
             'profile_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ];
+    }
+
+    public function failedValidation(Validator $validator)
+    {
+        return $this->apiRequestError($validator);
     }
 }

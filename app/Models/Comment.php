@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Jobs\NewCommentJob;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,6 +12,17 @@ class Comment extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    public static function booted()
+    {
+        static::created(function ($comment) {
+            $commentBy = auth()->user();
+            $post = $comment->post;
+            $followers = $post->followerUsers;
+            // $emails = $comment->post->followerUsers->where('user_id','!=',$user->id)->pluck('email')->toArray();
+            NewCommentJob::dispatchSync($post,$commentBy,$followers);
+        });
+    }
 
 
     public function user()
