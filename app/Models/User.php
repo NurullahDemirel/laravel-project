@@ -79,4 +79,25 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
             'post_id'
         )->withTimestamps();
     }
+
+    public function followers()
+    {
+        return $this->belongsToMany(User::class, 'followers', 'follow_to', 'follow_by')
+            ->wherePivot('is_accepted', 1);
+    }
+
+    public function sendingRequests()
+    {
+        return $this->belongsToMany(User::class, 'followers', 'follow_by', 'follow_to');
+    }
+
+    public function followsByMe()
+    {
+        return $this->sendingRequests()->wherePivot('is_accepted', 1);
+    }
+
+    public function pendingRequests()
+    {
+        return $this->sendingRequests()->wherePivot('is_accepted', 0);
+    }
 }

@@ -24,6 +24,7 @@ Route::middleware('apiMiddleware')->group(function () {
             Route::put('users', 'update');
             Route::post('user/logout', 'logout');
             Route::post('user/upload/profile/image', 'uploadImage');
+            Route::post('user/follow', 'follow');
         });
         Route::apiResource('posts', PostController::class);
         Route::apiResource('comments', CommentController::class);

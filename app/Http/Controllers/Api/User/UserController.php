@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\User;
 use App\Traits\ApiTrait;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\User\EditUserRequest;
+use App\Http\Requests\Api\User\FollowRequest;
 use App\Http\Requests\Api\User\NewUserRequest;
 use App\Http\Requests\Api\User\LoginRequest;
 use App\Http\Requests\Api\User\ProfileUplaodImageRequest;
@@ -155,6 +156,11 @@ class UserController extends Controller
         } catch (\Exception $exception) {
             return $this->exceptionResponse($exception);
         }
+    }
+
+    public function folow(FollowRequest $followRequest)
+    {
+        //todo
     }
 
 
