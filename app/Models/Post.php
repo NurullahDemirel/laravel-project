@@ -38,9 +38,13 @@ class Post extends Model
     {
         return $this->likes->contains('user_id', auth()->id()) ? 1 : 0;
     }
-
     public function followerUsers()
     {
-        return $this->hasMany(PostFollower::class, 'post_id', 'id');
+        return $this->belongsToMany(
+            User::class,
+            'post_followers',
+            'post_id',
+            'user_id'
+        )->withTimestamps();
     }
 }

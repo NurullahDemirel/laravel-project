@@ -31,8 +31,7 @@ class NewCommentJob implements ShouldQueue
      */
     public function handle(): void
     {
-        foreach ($this->postFollowers as $postFollower) {
-            Mail::to($postFollower->user->email)->send(new PostFollower($this->post,$this->commentby));
-        }
+        $emails = $this->postFollowers->pluck('email')->toArray();
+        Mail::to($emails)->send(new PostFollower($this->post, $this->commentby));
     }
 }

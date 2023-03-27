@@ -19,7 +19,6 @@ class Comment extends Model
             $commentBy = auth()->user();
             $post = $comment->post;
             $followers = $post->followerUsers;
-            // $emails = $comment->post->followerUsers->where('user_id','!=',$user->id)->pluck('email')->toArray();
             NewCommentJob::dispatchSync($post,$commentBy,$followers);
         });
     }
