@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Like\LikeRequest;
 use App\Models\Comment;
 use App\Models\Like;
+use Illuminate\Http\Response;
 
 class LikeController extends Controller
 {
@@ -20,7 +21,7 @@ class LikeController extends Controller
         try {
 
         if (!in_array($likeableType, Like::LIKEABLE_TYPES)) {
-            return $this->apiErrorResponse('This type not valid to like or dislike.');
+            return $this->returnWithMessag('This type not valid to like or dislike.',1,Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         if (($likeableType == Like::LIKEABLE_TYPE_POST) && ($this->checkRequestKey('post_id', $request))) {

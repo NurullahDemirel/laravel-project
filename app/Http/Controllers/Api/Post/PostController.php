@@ -20,7 +20,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::myPosts()->with(['likes','comments'])->get();
+        $posts = Post::myPosts()->with(['likes', 'comments'])->get();
         try {
             return $this->apiSuccessResponse(PostResource::collection($posts));
         } catch (\Exception $e) {
@@ -48,10 +48,10 @@ class PostController extends Controller
     public function show($postId)
     {
         try {
-            $post = Post::with(['comments.user','user'])->find($postId);
+            $post = Post::with(['comments.user', 'user'])->find($postId);
 
-            if(!$post)
-                return $this->apiErrorResponse('Post not found',Response::HTTP_NOT_FOUND);
+            if (!$post)
+                return $this->returnWithMessag('Post not found',1, Response::HTTP_NOT_FOUND);
 
             return $this->apiSuccessResponse(new PostResource($post));
         } catch (\Exception $e) {
@@ -98,12 +98,14 @@ class PostController extends Controller
 
     public function allPosts()
     {
+
         try {
-            $posts = Post::with('comments','user');
-            return $this->apiSuccessResponse(Post::all());
+            $followers = auth()->user()->followers()->select('follow_by')->get()->pluck('follow_by')->toArray();
+
+            $posts = Post::whereIn('user_id', $followers)->with('comments', 'user')->withCount('likes','comments')->get();
+            return $this->apiSuccessResponse($posts);
         } catch (\Exception $e) {
             return $this->exceptionResponse($e);
         }
     }
-
 }

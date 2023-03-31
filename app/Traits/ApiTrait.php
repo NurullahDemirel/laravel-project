@@ -31,22 +31,24 @@ trait ApiTrait
         return response()->json($basicData, $statuCode);
     }
 
-    public function apiErrorResponse($message, $statu = Response::HTTP_UNPROCESSABLE_ENTITY)
+    public function returnWithMessag($message, $error = 1, $statu = Response::HTTP_UNPROCESSABLE_ENTITY)
     {
         return response()->json([
-            'error' => true,
+            'error' => $error,
             'message' => $message,
         ], $statu);
     }
 
-    public function checkRequestKey($key,Request $request){
-        if(!$request->has($key)){
-            return $this->apiErrorResponse("{key} is required field for this request");
+    public function checkRequestKey($key, Request $request)
+    {
+        if (!$request->has($key)) {
+            return $this->returnWithMessag("${key} is required field for this request");
         }
         return true;
     }
 
-    public function apiRequestError(Validator $validator){
+    public function apiRequestError(Validator $validator)
+    {
         throw new HttpResponseException(response()->json([
             'error' => true,
             'errors' => $validator->errors()

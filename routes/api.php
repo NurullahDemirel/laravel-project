@@ -25,10 +25,12 @@ Route::middleware('apiMiddleware')->group(function () {
             Route::post('user/logout', 'logout');
             Route::post('user/upload/profile/image', 'uploadImage');
             Route::post('user/follow', 'follow');
+            Route::post('response/follower', 'responseFollower');
         });
         Route::apiResource('posts', PostController::class);
         Route::apiResource('comments', CommentController::class);
         Route::post('post/follow', PostFollowerController::class);
+        Route::get('all/posts',[PostController::class, 'allPosts']);
 
 
         Route::controller(LikeController::class)->group(function () {

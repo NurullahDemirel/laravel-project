@@ -2,21 +2,24 @@
 
 namespace App\Http\Controllers\Api\User;
 
-use App\Traits\ApiTrait;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\User\EditUserRequest;
-use App\Http\Requests\Api\User\FollowRequest;
-use App\Http\Requests\Api\User\NewUserRequest;
-use App\Http\Requests\Api\User\LoginRequest;
-use App\Http\Requests\Api\User\ProfileUplaodImageRequest;
-use App\Http\Resources\Api\User\UserResource;
-use App\Jobs\VerifyMailJob;
+use App\Enums\FollowRequestResponse;
 use App\Models\User;
+use App\Models\Follower;
+use App\Traits\ApiTrait;
+use App\Jobs\VerifyMailJob;
+use Illuminate\Support\Str;
 use Illuminate\Http\Response;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+use App\Http\Requests\Api\User\LoginRequest;
+use App\Http\Requests\Api\User\FollowRequest;
+use App\Http\Resources\Api\User\UserResource;
+use App\Http\Requests\Api\User\NewUserRequest;
+use App\Http\Requests\Api\User\EditUserRequest;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use App\Http\Requests\Api\User\ProfileUplaodImageRequest;
+use App\Http\Requests\Api\Follower\ResponseFollowerRequest;
 
 class UserController extends Controller
 {
@@ -158,9 +161,63 @@ class UserController extends Controller
         }
     }
 
-    public function folow(FollowRequest $followRequest)
+    public function follow(FollowRequest $followRequest)
     {
-        //todo
+        try {
+            $existsRequestBefore = Follower::where([['follow_by', '=', auth()->id()], ['follow_to', '=', $followRequest->get('follow_id')]])
+                ->first();
+
+            if (!$existsRequestBefore) {
+                //send request
+                Follower::create([
+                    'follow_by' => auth()->id(),
+                    'follow_to' => $followRequest->get('follow_id')
+                ]);
+                $process = 'send follow_request';
+            } else {
+                $process = $existsRequestBefore->is_accepted ? 'unfollowed' : 'backed to request';
+                $existsRequestBefore->delete();
+            }
+            return response()->json([
+                'error' => 0,
+                'message' => "User was {$process} successfully"
+            ], Response::HTTP_OK);
+        } catch (\Exception $exception) {
+            return $this->exceptionResponse($exception);
+        }
+    }
+
+    public function responseFollower(ResponseFollowerRequest $request){
+        try{
+
+            $follower = Follower::find($request->get('follow_request_id'));
+
+            if(auth()->id() != $follower->follow_to){
+                return $this->returnWithMessag('This request is not yours');
+            }
+
+
+            if($follower->is_accepted){
+                return $this->returnWithMessag('This request already accepted');
+            }
+
+            $response = $request->get('response');
+
+            if($response == FollowRequestResponse::Accep->value){
+                $follower->update(['is_accepted' =>1]);
+                $process = 'Accepted';
+            }
+            else if($response == FollowRequestResponse::Reject->value){
+                //todo delete request s
+                $follower->update(['is_accepted' =>0]);
+                $process = 'Rejected';;
+            }
+
+            return $this->apiSuccessResponse("request {$process} successfully",1, Response::HTTP_OK);
+
+        }catch(\Exception $exception){
+            return $this->exceptionResponse($exception);
+        }
     }
 
 
