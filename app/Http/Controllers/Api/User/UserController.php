@@ -29,7 +29,7 @@ class UserController extends Controller
     public function userInfo()
     {
         try {
-            return  $this->apiSuccessResponse(new UserResource(auth()->user()));
+            return  $this->apiSuccessResponse(['users' => new UserResource(auth()->user())]);
         } catch (\Exception $exception) {
             return $this->exceptionResponse($exception);
         }
@@ -53,9 +53,12 @@ class UserController extends Controller
             $token = $user->createToken('myApp')->plainTextToken;
 
             return $this->apiSuccessResponse(
-                new UserResource($user),
+                [
+                    'user' => new UserResource($user),
+                    'vertify_message' => 'Please check email for vertify your emial',
+                    'token' => $token
+                ],
                 Response::HTTP_CREATED,
-                ['vertify_message' => 'Please check email for vertify your emial', 'token' => $token]
             );
         } catch (\Exception $exception) {
             return $this->exceptionResponse($exception);
@@ -69,7 +72,7 @@ class UserController extends Controller
                 $user = Auth::user();
                 $token =  $user->createToken('myApp')->plainTextToken;
 
-                return $this->apiSuccessResponse(new UserResource($user), Response::HTTP_OK, ['token' => $token]);
+                return $this->apiSuccessResponse(['user' => new UserResource($user), 'token' => $token], Response::HTTP_OK);
             } else {
                 return response()->json([
                     'error' => 1,
@@ -101,9 +104,9 @@ class UserController extends Controller
             $updatedUser = User::find(auth()->id());
 
             return $this->apiSuccessResponse(
-                new UserResource($updatedUser),
+                ['user' => new UserResource($updatedUser)],
                 Response::HTTP_OK,
-                $hasPasspword  ? ['passwordMessage' => 'Your Password was updated successfully'] : []
+                $hasPasspword  ? 'Your Password was updated successfully' : null
             );
         } catch (\Exception $exception) {
             return $this->exceptionResponse($exception);
@@ -177,10 +180,8 @@ class UserController extends Controller
                 $process = $existsRequestBefore->is_accepted ? 'unfollowed' : 'backed to request';
                 $existsRequestBefore->delete();
             }
-            return response()->json([
-                'error' => 0,
-                'message' => "User was {$process} successfully"
-            ], Response::HTTP_OK);
+
+            return $this->apiSuccessResponse(null, Response::HTTP_OK, "User was {$process} successfully");
         } catch (\Exception $exception) {
             return $this->exceptionResponse($exception);
         }
@@ -214,24 +215,10 @@ class UserController extends Controller
                 $process = 'Rejected';;
             }
 
-            return $this->apiSuccessResponse("request {$process} successfully", Response::HTTP_OK);
+            return $this->apiSuccessResponse(null, Response::HTTP_OK, "request {$process} successfully");
         } catch (\Exception $exception) {
             return $this->exceptionResponse($exception);
         }
-    }
-
-    public function notifications(){
-
-    }
-
-
-    public function generateUniqueRandomNumber($length)
-    {
-        $number = '';
-        do {
-            $number = str_pad(random_int(0, (int)pow(10, $length) - 1), $length, '0', STR_PAD_LEFT);
-        } while (User::where('code', $number)->exists());
-        return $number;
     }
 
     public function createProfileImageName()

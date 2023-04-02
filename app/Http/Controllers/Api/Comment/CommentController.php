@@ -23,7 +23,7 @@ class CommentController extends Controller
 
         try {
             $comments = Comment::myComments()->with(['post', 'likes'])->get();
-            return $this->apiSuccessResponse(CommentResource::collection($comments));
+            return $this->apiSuccessResponse(['comments' => CommentResource::collection($comments)]);
         } catch (\Exception $e) {
             return $this->exceptionResponse($e);
         }
@@ -37,7 +37,7 @@ class CommentController extends Controller
         try {
             $comment = auth()->user()->comments()->create($request->validated())->with('post.followerUsers');
 
-            return $this->apiSuccessResponse(new CommentResource($comment), Response::HTTP_CREATED);
+            return $this->apiSuccessResponse(['comment' => new CommentResource($comment)], Response::HTTP_CREATED);
         } catch (\Exception $e) {
             return $this->exceptionResponse($e);
         }
@@ -49,7 +49,7 @@ class CommentController extends Controller
     public function show(Comment $comment)
     {
         try {
-            return $this->apiSuccessResponse(new CommentResource($comment));
+            return $this->apiSuccessResponse(['comment' => new CommentResource($comment)]);
         } catch (\Exception $e) {
             return $this->exceptionResponse($e);
         }
@@ -63,7 +63,7 @@ class CommentController extends Controller
         try {
             $comment->update($request->validated());
 
-            return $this->apiSuccessResponse($comment);
+            return $this->apiSuccessResponse(['comment' => $comment]);
         } catch (\Exception $e) {
             return $this->exceptionResponse($e);
         }
@@ -86,7 +86,7 @@ class CommentController extends Controller
             });
 
 
-            return $this->apiSuccessResponse(['message' => "Successfully deleted"]);
+            return $this->apiSuccessResponse(null,Response::HTTP_OK,"Successfully deleted");
         } catch (\Exception $e) {
             return $this->exceptionResponse($e);
         }

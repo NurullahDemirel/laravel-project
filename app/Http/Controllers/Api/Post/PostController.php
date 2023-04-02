@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\Post\PostResource;
 use App\Http\Requests\Api\Post\StorePostRequest;
 use App\Http\Requests\Api\Post\UpdatePostRequest;
+use Http;
 use Illuminate\Support\Facades\DB;
 
 class PostController extends Controller
@@ -22,7 +23,7 @@ class PostController extends Controller
     {
         $posts = Post::myPosts()->with(['likes', 'comments'])->get();
         try {
-            return $this->apiSuccessResponse(PostResource::collection($posts));
+            return $this->apiSuccessResponse(['posts' => PostResource::collection($posts)]);
         } catch (\Exception $e) {
             return $this->exceptionResponse($e);
         }
@@ -36,7 +37,7 @@ class PostController extends Controller
         try {
             $posts = auth()->user()->posts()->create($request->validated());
 
-            return $this->apiSuccessResponse(new PostResource($posts), Response::HTTP_CREATED);
+            return $this->apiSuccessResponse(['post' => new PostResource($posts)], Response::HTTP_CREATED);
         } catch (\Exception $e) {
             return $this->exceptionResponse($e);
         }
@@ -51,9 +52,9 @@ class PostController extends Controller
             $post = Post::with(['comments.user', 'user'])->find($postId);
 
             if (!$post)
-                return $this->returnWithMessag('Post not found',1, Response::HTTP_NOT_FOUND);
+                return $this->returnWithMessag('Post not found', 1, Response::HTTP_NOT_FOUND);
 
-            return $this->apiSuccessResponse(new PostResource($post));
+            return $this->apiSuccessResponse(['post' => new PostResource($post)]);
         } catch (\Exception $e) {
             return $this->exceptionResponse($e);
         }
@@ -70,7 +71,7 @@ class PostController extends Controller
 
             $updatedPost = Post::find($post->id);
 
-            return $this->apiSuccessResponse(new PostResource($post));
+            return $this->apiSuccessResponse(['post' => new PostResource($post)]);
         } catch (\Exception $e) {
             return $this->exceptionResponse($e);
         }
@@ -90,7 +91,7 @@ class PostController extends Controller
                 Like::getByType(Post::class)->getByLikeableId($post->id)->delete();
                 $post->delete();
             });
-            return $this->apiSuccessResponse(['message' => "Successfully deleted"]);
+            return $this->apiSuccessResponse(null, Response::HTTP_OK, "Successfully deleted");
         } catch (\Exception $e) {
             return $this->exceptionResponse($e);
         }
@@ -102,8 +103,8 @@ class PostController extends Controller
         try {
             $followers = auth()->user()->followers()->select('follow_by')->get()->pluck('follow_by')->toArray();
 
-            $posts = Post::whereIn('user_id', $followers)->with('comments', 'user')->withCount('likes','comments')->get();
-            return $this->apiSuccessResponse($posts);
+            $posts = Post::whereIn('user_id', $followers)->with('comments', 'user')->withCount('likes', 'comments')->get();
+            return $this->apiSuccessResponse(['posts' => $posts]);
         } catch (\Exception $e) {
             return $this->exceptionResponse($e);
         }

@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -21,15 +22,16 @@ trait ApiTrait
         return response()->json($response, Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
-    public function apiSuccessResponse($message, $statuCode = Response::HTTP_OK, $additionalData = [])
+    public function apiSuccessResponse($data=null, $statuCode = Response::HTTP_OK, $message = null)
     {
-        $basicData = [
-            'error' => false,
-            'message' => $message,
-        ];
+        $basicData = ['error' => false ];
 
-        if (!empty($additionalData)) {
-            $basicData['data']  = $additionalData;
+        if($data){
+            $basicData ['data'] = $data;
+        }
+
+        if ($message) {
+            $basicData['message']  = $message;
         }
 
         return response()->json($basicData, $statuCode);
@@ -57,5 +59,14 @@ trait ApiTrait
             'error' => true,
             'errors' => $validator->errors()
         ], Response::HTTP_UNPROCESSABLE_ENTITY));
+    }
+
+    public function generateUniqueRandomNumber($length)
+    {
+        $number = '';
+        do {
+            $number = str_pad(random_int(0, (int)pow(10, $length) - 1), $length, '0', STR_PAD_LEFT);
+        } while (User::where('code', $number)->exists());
+        return $number;
     }
 }
