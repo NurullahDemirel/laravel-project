@@ -15,18 +15,22 @@ trait ApiTrait
             'error' => 1,
             'message' => $exception->getMessage(),
             'line' => $exception->getLine(),
+            'file' => $exception->getFile(),
             'code' => $exception->getCode()
         ];
         return response()->json($response, Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
-    public function apiSuccessResponse($data, $statuCode = Response::HTTP_OK, $additionalData = [])
+    public function apiSuccessResponse($message, $statuCode = Response::HTTP_OK, $additionalData = [])
     {
         $basicData = [
             'error' => false,
-            'data' => $data,
+            'message' => $message,
         ];
-        $basicData = !empty($additionalData) ? array_merge($basicData, $additionalData) : $data;
+
+        if (!empty($additionalData)) {
+            $basicData['data']  = $additionalData;
+        }
 
         return response()->json($basicData, $statuCode);
     }

@@ -16,9 +16,5 @@ class Controller extends BaseController
     public function test()
     {
 
-
-        dd(User::with('followsByMe')->find(13));
-
-        dd('saas');
     }
 }

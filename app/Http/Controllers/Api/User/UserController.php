@@ -20,12 +20,11 @@ use App\Http\Requests\Api\User\EditUserRequest;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use App\Http\Requests\Api\User\ProfileUplaodImageRequest;
 use App\Http\Requests\Api\Follower\ResponseFollowerRequest;
+use App\Notifications\AccepRequest;
 
 class UserController extends Controller
 {
     use ApiTrait;
-
-    const AWS_PROFILE_IMAGES_PATH = '/User/Profile/';
 
     public function userInfo()
     {
@@ -187,37 +186,42 @@ class UserController extends Controller
         }
     }
 
-    public function responseFollower(ResponseFollowerRequest $request){
-        try{
+    public function responseFollower(ResponseFollowerRequest $request)
+    {
+        try {
+            $followerRequest = Follower::find($request->get('follow_request_id'));
 
-            $follower = Follower::find($request->get('follow_request_id'));
+            $follower = User::find($followerRequest->follow_by);
 
-            if(auth()->id() != $follower->follow_to){
+            if (auth()->id() != $followerRequest->follow_to) {
                 return $this->returnWithMessag('This request is not yours');
             }
 
 
-            if($follower->is_accepted){
+            if ($followerRequest->is_accepted) {
                 return $this->returnWithMessag('This request already accepted');
             }
 
             $response = $request->get('response');
 
-            if($response == FollowRequestResponse::Accep->value){
-                $follower->update(['is_accepted' =>1]);
+
+            if ($response == FollowRequestResponse::Accep->value) {
+                $followerRequest->update(['is_accepted' => 1]);
+                $follower->notify(new AccepRequest(auth()->user()));
                 $process = 'Accepted';
-            }
-            else if($response == FollowRequestResponse::Reject->value){
-                //todo delete request s
-                $follower->update(['is_accepted' =>0]);
+            } else if ($response == FollowRequestResponse::Reject->value) {
+                $followerRequest->delete();
                 $process = 'Rejected';;
             }
 
-            return $this->apiSuccessResponse("request {$process} successfully",1, Response::HTTP_OK);
-
-        }catch(\Exception $exception){
+            return $this->apiSuccessResponse("request {$process} successfully", Response::HTTP_OK);
+        } catch (\Exception $exception) {
             return $this->exceptionResponse($exception);
         }
+    }
+
+    public function notifications(){
+
     }
 
 
