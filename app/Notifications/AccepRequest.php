@@ -3,12 +3,16 @@
 namespace App\Notifications;
 
 use App\Models\User;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Messages\BroadcastMessage;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class AccepRequest extends Notification
+class AccepRequest extends Notification implements ShouldBroadcast
 {
     use Queueable;
 
@@ -27,7 +31,7 @@ class AccepRequest extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'database', 'broadcast'];
     }
 
     /**
@@ -36,8 +40,21 @@ class AccepRequest extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->line("{$this->user->name} accepted your request")
-                    ->action('User Profile', url("api/user/{$this->user->id}"));
+            ->line("{$this->user->name} accepted your request")
+            ->action('User Profile', url("api/user/{$this->user->id}"));
+    }
+
+    public function toBroadcast($notifiable): BroadcastMessage
+    {
+        return new BroadcastMessage([
+            'message' => "heyy"
+        ]);
+    }
+
+    public function broadcastOn()
+    {
+        // return new Channel('requestResponse');
+        return new PrivateChannel('requestResponse');
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\User;
 
 use App\Enums\FollowRequestResponse;
+use App\Events\TestEvent;
 use App\Models\User;
 use App\Models\Follower;
 use App\Traits\ApiTrait;
@@ -207,7 +208,8 @@ class UserController extends Controller
 
 
             if ($response == FollowRequestResponse::Accep->value) {
-                $followerRequest->update(['is_accepted' => 1]);
+                // TestEvent::dispatch();
+                // $followerRequest->update(['is_accepted' => 1]);
                 $follower->notify(new AccepRequest(auth()->user()));
                 $process = 'Accepted';
             } else if ($response == FollowRequestResponse::Reject->value) {
