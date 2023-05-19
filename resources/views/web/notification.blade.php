@@ -2,7 +2,6 @@
 
 <head>
     <title>Pusher Test</title>
-    @vite('resources/js/app.js')
 
 </head>
 
@@ -13,6 +12,7 @@
         with event name <code>my-event</code>.
     </p>
 
+    @vite('resources/js/app.js')
 
 
 </body>

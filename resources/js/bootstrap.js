@@ -20,6 +20,8 @@ import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 window.Pusher = Pusher;
 
+console.log('sas');
+
 window.Echo = new Echo({
     broadcaster: 'pusher',
     key: import.meta.env.VITE_PUSHER_APP_KEY,
@@ -31,8 +33,8 @@ window.Echo = new Echo({
     enabledTransports: ['ws', 'wss'],
 });
 
-window.Echo.private('requestResponse')
-    .listen('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', function (e) {
+window.Echo.channel('requestResponse')
+    .listen('.Illuminate\Notifications\Events\BroadcastNotificationCreated', function (e) {
         console.log("1");
 });
 

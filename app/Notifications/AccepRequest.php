@@ -53,8 +53,8 @@ class AccepRequest extends Notification implements ShouldBroadcast
 
     public function broadcastOn()
     {
-        // return new Channel('requestResponse');
-        return new PrivateChannel('requestResponse');
+        return new Channel('requestResponse');
+        // return new PrivateChannel('requestResponse');
     }
 
     /**
