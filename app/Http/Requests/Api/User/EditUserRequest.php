@@ -26,12 +26,14 @@ class EditUserRequest extends FormRequest
     public function rules(): array
     {
 
+        // asetas@gmail.com
+
         return [
             'name' => 'required',
             //ignore auth user
-            'email' => 'required|email|unique:users,email,'.auth()->id(),
-              'password' => [Rule::when($this->has('password'),'required|min:5')],
-             'repeat_password' => [Rule::when($this->has('password'),'required|same:password')]
+            'email' => 'required|email|unique:users,email,' . auth()->id(),
+            'password' => [Rule::when($this->has('password'), 'required|min:5')],
+            'repeat_password' => [Rule::when($this->has('password'), 'required|same:password')]
         ];
     }
 

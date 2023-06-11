@@ -7,12 +7,9 @@ use App\Http\Controllers\Api\PostFollower\PostFollowerController;
 use App\Http\Controllers\Api\User\SocialiteController;
 use App\Http\Controllers\Api\User\UserVeriyController;
 use App\Http\Controllers\Api\User\UserController;
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('apiMiddleware')->group(function () {
-
     Route::get('user/verify/{code}', UserVeriyController::class);
 
     Route::post('users', [UserController::class, 'store']);
@@ -39,6 +36,11 @@ Route::middleware('apiMiddleware')->group(function () {
 
         Route::controller(LikeController::class)->group(function () {
             Route::post('like/{likeableType}', 'likeOrDislike');
+        });
+
+
+        Route::post('/broadcasting/auth', function () { //for chceck
+            return auth()->check();
         });
     });
 });

@@ -17,6 +17,12 @@ Broadcast::channel('requestResponse', function () {
     return true;
 });
 
-Broadcast::channel('my-channel', function () {
+Broadcast::channel('privateChannel', function () {
+    // Kullanıcının yetkisi varsa özel kanala erişim izni verir
+    // return $user !== null;
     return true;
 });
+
+
+
+Broadcast::routes(['middleware' => 'auth:sanctum']);

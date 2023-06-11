@@ -15,11 +15,13 @@ class Comment extends Model
 
     public static function booted()
     {
+        //TODO do by observer
         static::created(function ($comment) {
             $commentBy = auth()->user();
             $post = $comment->post;
             $followers = $post->followerUsers;
-            NewCommentJob::dispatchSync($post,$commentBy,$followers);
+            //remove comlex data as collection or mode e.tc. move to in string rry as simple data
+            NewCommentJob::dispatchSync($post, $commentBy, $followers);
         });
     }
 

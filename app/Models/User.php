@@ -49,13 +49,13 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
         'email_verified_at' => 'datetime',
     ];
 
-    public function registerMediaCollections(): void
+    public function registerMediaCollections(): void // her kişi bir tane profil resmi olabilir
     {
         $this->addMediaCollection('profile')
             ->singleFile();
     }
 
-    public function posts()
+    public function posts()//bir userın birden çok posu olabilir
     {
         return $this->hasMany(Post::class, 'user_id', 'id');
     }
@@ -86,17 +86,17 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
             ->wherePivot('is_accepted', 1);
     }
 
-    public function sendingRequests()
+    public function sendingRequests()//ben kime istek attım ?
     {
         return $this->belongsToMany(User::class, 'followers', 'follow_by', 'follow_to');
     }
 
-    public function followsByMe()
+    public function followsByMe()//ben kimi takip ediyorum ?
     {
         return $this->sendingRequests()->wherePivot('is_accepted', 1);
     }
 
-    public function pendingRequests()
+    public function pendingRequests()//ben kime istek attım da  kabul etmedi?
     {
         return $this->sendingRequests()->wherePivot('is_accepted', 0);
     }

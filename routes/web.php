@@ -15,9 +15,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-//tihis route made with example. in a spa project can integrate eaisly project
-Route::get('notifications', function () {
-    Auth::login(User::find((183)));
+// //tihis route made with example. in a spa project can integrate eaisly project
+// Route::get('notifications', function () {
+//     Auth::login(User::find((183)));
+//     auth()->logout();
 
-    return view('web.notification');
-});
+//     return view('web.notification');
+// });

@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Api\User;
 
 use App\Enums\FollowRequestResponse;
-use App\Events\AccepRequest as EventsAccepRequest;
-use App\Events\TestEvent;
 use App\Models\User;
 use App\Models\Follower;
 use App\Traits\ApiTrait;
@@ -194,31 +192,30 @@ class UserController extends Controller
         try {
             $followerRequest = Follower::find($request->get('follow_request_id'));
 
-            $follower = User::find($followerRequest->follow_by);
-
             if (auth()->id() != $followerRequest->follow_to) {
                 return $this->returnWithMessag('This request is not yours');
             }
+
+            $follower = User::find($followerRequest->follow_by);
 
 
             if ($followerRequest->is_accepted) {
                 return $this->returnWithMessag('This request already accepted');
             }
 
-            $response = $request->get('response');
 
+            $response = $request->get('response');
 
             if ($response == FollowRequestResponse::Accept->value) {
                 // TestEvent::dispatch();
                 // $followerRequest->update(['is_accepted' => 1]);
-                $follower->notify(new AccepRequest(auth()->user()));
+                $follower->notify(new AccepRequest(auth()->id()));
                 // broadcast(new EventsAccepRequest(auth()->user()));
                 $process = 'Accepted';
             } else if ($response == FollowRequestResponse::Reject->value) {
                 $followerRequest->delete();
-                $process = 'Rejected';;
+                $process = 'Rejected';
             }
-
             return $this->apiSuccessResponse(null, Response::HTTP_OK, "request {$process} successfully");
         } catch (\Exception $exception) {
             return $this->exceptionResponse($exception);

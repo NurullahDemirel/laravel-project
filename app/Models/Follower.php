@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class Follower extends Model
 {
 
-    protected $guarded = [] ;
+    protected $guarded = [];
     use HasFactory;
 
 
@@ -21,8 +21,8 @@ class Follower extends Model
             $followTo->notify(new NewFollowerRequest(auth()->user()));
         });
 
-        static::updated(function($follower){
+        // static::updated(function($follower){
 
-        });
+        // });
     }
 }

@@ -34,11 +34,11 @@ class Post extends Model
         return $this->morphMany(Like::class, 'likeable');
     }
 
-    public function getIsLikedAttribute()
+    public function getIsLikedAttribute()//bu postu beğenenler arasında ben var mıyım?
     {
         return $this->likes->contains('user_id', auth()->id()) ? 1 : 0;
     }
-    public function followerUsers()
+    public function followerUsers()//beni hangi kullanıcılar takip ediyor ?
     {
         return $this->belongsToMany(
             User::class,

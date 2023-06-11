@@ -19,9 +19,11 @@ class AccepRequest extends Notification implements ShouldBroadcast
     /**
      * Create a new notification instance.
      */
-    public function __construct(public User $user)
+
+    public User $user;
+    public function __construct($userId)
     {
-        //
+        $this->user = User::find($userId);
     }
 
     /**
@@ -53,8 +55,8 @@ class AccepRequest extends Notification implements ShouldBroadcast
 
     public function broadcastOn()
     {
-        return new Channel('requestResponse');
-        // return new PrivateChannel('requestResponse');
+        // return new Channel('requestResponse');
+        return new PrivateChannel('privateChannel');
     }
 
     /**
