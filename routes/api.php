@@ -40,7 +40,7 @@ Route::middleware('apiMiddleware')->group(function () {
 
 
         Route::post('/broadcasting/auth', function () { //for chceck
-            return auth()->check();
+            return auth()->user();
         });
     });
 });

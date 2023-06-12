@@ -18,9 +18,7 @@ Broadcast::channel('requestResponse', function () {
 });
 
 Broadcast::channel('privateChannel', function () {
-    // Kullanıcının yetkisi varsa özel kanala erişim izni verir
-    // return $user !== null;
-    return true;
+        return true;
 });
 
 

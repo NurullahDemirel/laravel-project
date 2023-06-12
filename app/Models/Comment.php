@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Jobs\NewCommentJob;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,19 +11,6 @@ class Comment extends Model
     use HasFactory;
 
     protected $guarded = [];
-
-    public static function booted()
-    {
-        //TODO do by observer
-        static::created(function ($comment) {
-            $commentBy = auth()->user();
-            $post = $comment->post;
-            $followers = $post->followerUsers;
-            //remove comlex data as collection or mode e.tc. move to in string rry as simple data
-            NewCommentJob::dispatchSync($post, $commentBy, $followers);
-        });
-    }
-
 
     public function user()
     {

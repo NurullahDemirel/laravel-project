@@ -216,6 +216,7 @@ class UserController extends Controller
                 $followerRequest->delete();
                 $process = 'Rejected';
             }
+
             return $this->apiSuccessResponse(null, Response::HTTP_OK, "request {$process} successfully");
         } catch (\Exception $exception) {
             return $this->exceptionResponse($exception);

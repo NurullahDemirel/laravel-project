@@ -12,12 +12,13 @@ class NewFollowerRequest extends Notification
 {
     use Queueable;
 
+    public User $user;
     /**
      * Create a new notification instance.
      */
-    public function __construct(public User $user)
+    public function __construct(public $followById)
     {
-        //
+        $this->user = User::find($followById);
     }
 
     /**
