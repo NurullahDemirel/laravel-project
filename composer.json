@@ -15,6 +15,7 @@
         "laravel/tinker": "^2.8",
         "league/flysystem-aws-s3-v3": "3.0",
         "pusher/pusher-php-server": "^7.2",
+        "qirolab/laravel-reactions": "^2.7",
         "spatie/laravel-medialibrary": "^10.7"
     },
     "require-dev": {

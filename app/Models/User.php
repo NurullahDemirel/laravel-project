@@ -12,9 +12,12 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
-class User extends Authenticatable implements HasMedia, MustVerifyEmail
+use Qirolab\Laravel\Reactions\Contracts\ReactsInterface;
+use Qirolab\Laravel\Reactions\Traits\Reacts;
+
+class User extends Authenticatable implements HasMedia, MustVerifyEmail, ReactsInterface
 {
-    use HasApiTokens, HasFactory, Notifiable, InteractsWithMedia;
+    use HasApiTokens, HasFactory, Notifiable, InteractsWithMedia, Reacts;
 
     const AWS_PROFILE_IMAGES_PATH = 'User/Profile/';
 
@@ -55,7 +58,7 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
             ->singleFile();
     }
 
-    public function posts()//bir userın birden çok posu olabilir
+    public function posts() //bir userın birden çok posu olabilir
     {
         return $this->hasMany(Post::class, 'user_id', 'id');
     }
@@ -86,17 +89,17 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
             ->wherePivot('is_accepted', 1);
     }
 
-    public function sendingRequests()//ben kime istek attım ?
+    public function sendingRequests() //ben kime istek attım ?
     {
         return $this->belongsToMany(User::class, 'followers', 'follow_by', 'follow_to');
     }
 
-    public function followsByMe()//ben kimi takip ediyorum ?
+    public function followsByMe() //ben kimi takip ediyorum ?
     {
         return $this->sendingRequests()->wherePivot('is_accepted', 1);
     }
 
-    public function pendingRequests()//ben kime istek attım da  kabul etmedi?
+    public function pendingRequests() //ben kime istek attım da  kabul etmedi?
     {
         return $this->sendingRequests()->wherePivot('is_accepted', 0);
     }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Post;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -15,10 +16,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// //tihis route made with example. in a spa project can integrate eaisly project
-// Route::get('notifications', function () {
-//     Auth::login(User::find((183)));
-//     auth()->logout();
+Route::get('', function () {
+});
 
-//     return view('web.notification');
-// });
+Route::get('/test', function () {
+});

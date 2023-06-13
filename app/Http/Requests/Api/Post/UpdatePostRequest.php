@@ -26,8 +26,8 @@ class UpdatePostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => Rule::when($this->has('title'),'required|min:5'),
-            'description' => Rule::when($this->has('description'),'required|min:5'),
+            'title' => Rule::when($this->has('title'), 'required|min:5'),
+            'description' => Rule::when($this->has('description'), 'required|min:5'),
         ];
     }
     public function failedValidation(Validator $validator)
