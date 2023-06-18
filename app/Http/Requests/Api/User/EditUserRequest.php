@@ -10,6 +10,7 @@ use Illuminate\Validation\Rule;
 class EditUserRequest extends FormRequest
 {
     use ApiTrait;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -31,9 +32,9 @@ class EditUserRequest extends FormRequest
         return [
             'name' => 'required',
             //ignore auth user
-            'email' => 'required|email|unique:users,email,' . auth()->id(),
+            'email' => 'required|email|unique:users,email,'.auth()->id(),
             'password' => [Rule::when($this->has('password'), 'required|min:5')],
-            'repeat_password' => [Rule::when($this->has('password'), 'required|same:password')]
+            'repeat_password' => [Rule::when($this->has('password'), 'required|same:password')],
         ];
     }
 

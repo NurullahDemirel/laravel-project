@@ -3,19 +3,20 @@
 namespace App\Http\Requests\Api\Post;
 
 use App\Traits\ApiTrait;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 
 class StorePostRequest extends FormRequest
 {
     use ApiTrait;
+
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
 
-        return !is_null(auth()->user());
+        return ! is_null(auth()->user());
     }
 
     /**
@@ -30,6 +31,7 @@ class StorePostRequest extends FormRequest
             'description' => 'required|min:5',
         ];
     }
+
     public function failedValidation(Validator $validator)
     {
         return $this->apiRequestError($validator);

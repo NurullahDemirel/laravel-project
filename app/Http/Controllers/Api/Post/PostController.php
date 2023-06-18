@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers\Api\Post;
 
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Post\StorePostRequest;
+use App\Http\Requests\Api\Post\UpdatePostRequest;
+use App\Http\Resources\Api\Post\PostResource;
 use App\Models\Like;
 use App\Models\Post;
 use App\Traits\ApiTrait;
 use Illuminate\Http\Response;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\Api\Post\PostResource;
-use App\Http\Requests\Api\Post\StorePostRequest;
-use App\Http\Requests\Api\Post\UpdatePostRequest;
-use Http;
 use Illuminate\Support\Facades\DB;
 
 class PostController extends Controller
 {
     use ApiTrait;
+
     /**
      * Display a listing of the resource.
      */
@@ -51,8 +51,9 @@ class PostController extends Controller
         try {
             $post = Post::with(['comments.user', 'user'])->find($postId);
 
-            if (!$post)
+            if (! $post) {
                 return $this->returnWithMessag('Post not found', 1, Response::HTTP_NOT_FOUND);
+            }
 
             return $this->apiSuccessResponse(['post' => new PostResource($post)]);
         } catch (\Exception $e) {
@@ -91,7 +92,8 @@ class PostController extends Controller
                 Like::getByType(Post::class)->getByLikeableId($post->id)->delete();
                 $post->delete();
             });
-            return $this->apiSuccessResponse(null, Response::HTTP_OK, "Successfully deleted");
+
+            return $this->apiSuccessResponse(null, Response::HTTP_OK, 'Successfully deleted');
         } catch (\Exception $e) {
             return $this->exceptionResponse($e);
         }
@@ -104,6 +106,7 @@ class PostController extends Controller
             $followers = auth()->user()->followers()->select('follow_by')->get()->pluck('follow_by')->toArray();
 
             $posts = Post::whereIn('user_id', $followers)->with('comments', 'user')->withCount('likes', 'comments')->get();
+
             return $this->apiSuccessResponse(['posts' => $posts]);
         } catch (\Exception $e) {
             return $this->exceptionResponse($e);

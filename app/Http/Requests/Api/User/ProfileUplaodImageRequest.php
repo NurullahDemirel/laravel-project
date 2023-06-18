@@ -3,18 +3,19 @@
 namespace App\Http\Requests\Api\User;
 
 use App\Traits\ApiTrait;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 
 class ProfileUplaodImageRequest extends FormRequest
 {
     use ApiTrait;
+
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return !is_null(auth()->user());
+        return ! is_null(auth()->user());
     }
 
     /**
@@ -26,7 +27,7 @@ class ProfileUplaodImageRequest extends FormRequest
     {
         // 'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048|dimensions:width=500,height=500']);
         return [
-            'profile_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+            'profile_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ];
     }
 

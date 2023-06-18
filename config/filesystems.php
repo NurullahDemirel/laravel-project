@@ -57,13 +57,6 @@ return [
         ],
 
 
-        'emojis' => [
-            'driver' => 'local',
-            'root' => public_path('emojis'),
-            'visibility' => 'public',
-            'throw' => false,
-        ],
-
     ],
 
     /*

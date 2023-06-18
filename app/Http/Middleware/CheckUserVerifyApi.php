@@ -18,15 +18,16 @@ class CheckUserVerifyApi
     public function handle(Request $request, Closure $next): Response
     {
         if (
-            !$request->user() ||
+            ! $request->user() ||
             ($request->user() instanceof MustVerifyEmail &&
-                !is_null($request->user()->code))
+                ! is_null($request->user()->code))
         ) {
             return response()->json([
                 'error' => 1,
-                'error_message' => 'Please verify your email'
+                'error_message' => 'Please verify your email',
             ], HttpResponse::HTTP_FORBIDDEN);
         }
+
         return $next($request);
     }
 }

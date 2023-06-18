@@ -3,24 +3,24 @@
 namespace App\Http\Controllers\Api\User;
 
 use App\Enums\FollowRequestResponse;
-use App\Models\User;
-use App\Models\Follower;
-use App\Traits\ApiTrait;
-use App\Jobs\VerifyMailJob;
-use Illuminate\Support\Str;
-use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Follower\ResponseFollowerRequest;
+use App\Http\Requests\Api\User\EditUserRequest;
+use App\Http\Requests\Api\User\FollowRequest;
+use App\Http\Requests\Api\User\LoginRequest;
+use App\Http\Requests\Api\User\NewUserRequest;
+use App\Http\Requests\Api\User\ProfileUplaodImageRequest;
+use App\Http\Resources\Api\User\UserResource;
+use App\Jobs\VerifyMailJob;
+use App\Models\Follower;
+use App\Models\User;
+use App\Notifications\AccepRequest;
+use App\Traits\ApiTrait;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use App\Http\Requests\Api\User\LoginRequest;
-use App\Http\Requests\Api\User\FollowRequest;
-use App\Http\Resources\Api\User\UserResource;
-use App\Http\Requests\Api\User\NewUserRequest;
-use App\Http\Requests\Api\User\EditUserRequest;
+use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use App\Http\Requests\Api\User\ProfileUplaodImageRequest;
-use App\Http\Requests\Api\Follower\ResponseFollowerRequest;
-use App\Notifications\AccepRequest;
 
 class UserController extends Controller
 {
@@ -29,7 +29,7 @@ class UserController extends Controller
     public function userInfo()
     {
         try {
-            return  $this->apiSuccessResponse(['users' => new UserResource(auth()->user())]);
+            return $this->apiSuccessResponse(['users' => new UserResource(auth()->user())]);
         } catch (\Exception $exception) {
             return $this->exceptionResponse($exception);
         }
@@ -49,14 +49,13 @@ class UserController extends Controller
 
             VerifyMailJob::dispatchSync($code, $request->get('email'));
 
-
             $token = $user->createToken('myApp')->plainTextToken;
 
             return $this->apiSuccessResponse(
                 [
                     'user' => new UserResource($user),
                     'vertify_message' => 'Please check email for vertify your emial',
-                    'token' => $token
+                    'token' => $token,
                 ],
                 Response::HTTP_CREATED,
             );
@@ -70,13 +69,13 @@ class UserController extends Controller
         try {
             if (Auth::attempt($request->validated())) {
                 $user = Auth::user();
-                $token =  $user->createToken('myApp')->plainTextToken;
+                $token = $user->createToken('myApp')->plainTextToken;
 
                 return $this->apiSuccessResponse(['user' => new UserResource($user), 'token' => $token], Response::HTTP_OK);
             } else {
                 return response()->json([
                     'error' => 1,
-                    'message' => 'Email veya şifre hatalı'
+                    'message' => 'Email veya şifre hatalı',
                 ], Response::HTTP_BAD_REQUEST);
             }
         } catch (\Exception $exception) {
@@ -84,11 +83,10 @@ class UserController extends Controller
         }
     }
 
-
     public function update(EditUserRequest $request)
     {
 
-        $hasPasspword =  $request->has('password');
+        $hasPasspword = $request->has('password');
 
         try {
             if ($hasPasspword) {
@@ -106,7 +104,7 @@ class UserController extends Controller
             return $this->apiSuccessResponse(
                 ['user' => new UserResource($updatedUser)],
                 Response::HTTP_OK,
-                $hasPasspword  ? 'Your Password was updated successfully' : null
+                $hasPasspword ? 'Your Password was updated successfully' : null
             );
         } catch (\Exception $exception) {
             return $this->exceptionResponse($exception);
@@ -116,46 +114,47 @@ class UserController extends Controller
     public function destroy(string $id)
     {
         try {
-            $user = User::find(auth()->id());
+            $user = User::find($id);
             $user->delete();
 
             return response()->json([
                 'error' => 0,
-                'message' => 'User was deleted successfully.'
+                'message' => 'User was deleted successfully.',
             ], Response::HTTP_OK);
         } catch (\Exception $exception) {
 
             return $this->exceptionResponse($exception);
         }
     }
+
     public function logout()
     {
         auth()->user()->tokens()->delete();
 
         return response()->json([
             'error' => 0,
-            'message' => 'User was  logged out successfully'
+            'message' => 'User was  logged out successfully',
         ], Response::HTTP_OK);
     }
 
     public function uploadImage(ProfileUplaodImageRequest $request)
     {
         try {
-            $imageName = $this->createProfileImageName() . '.' . $request->profile_image->extension();
+            $imageName = $this->createProfileImageName().'.'.$request->profile_image->extension();
 
-            $libraryModel =  auth()->user()->addMediaFromRequest('profile_image', $imageName)
+            $libraryModel = auth()->user()->addMediaFromRequest('profile_image', $imageName)
                 ->usingFileName($imageName)
                 ->toMediaCollection('profile');
 
             if ($libraryModel instanceof Media) {
                 return response()->json([
                     'error' => 0,
-                    'message' => 'Image was uploaded successfully'
+                    'message' => 'Image was uploaded successfully',
                 ], Response::HTTP_OK);
             } else {
                 return response()->json([
                     'error' => 1,
-                    'message' => 'Something went wrong when uploading image to aws'
+                    'message' => 'Something went wrong when uploading image to aws',
                 ], Response::HTTP_OK);
             }
         } catch (\Exception $exception) {
@@ -169,11 +168,11 @@ class UserController extends Controller
             $existsRequestBefore = Follower::where([['follow_by', '=', auth()->id()], ['follow_to', '=', $followRequest->get('follow_id')]])
                 ->first();
 
-            if (!$existsRequestBefore) {
+            if (! $existsRequestBefore) {
                 //send request
                 Follower::create([
                     'follow_by' => auth()->id(),
-                    'follow_to' => $followRequest->get('follow_id')
+                    'follow_to' => $followRequest->get('follow_id'),
                 ]);
                 $process = 'send follow_request';
             } else {
@@ -198,11 +197,9 @@ class UserController extends Controller
 
             $follower = User::find($followerRequest->follow_by);
 
-
             if ($followerRequest->is_accepted) {
                 return $this->returnWithMessag('This request already accepted');
             }
-
 
             $response = $request->get('response');
 
@@ -212,10 +209,12 @@ class UserController extends Controller
                 $follower->notify(new AccepRequest(auth()->id()));
                 // broadcast(new EventsAccepRequest(auth()->user()));
                 $process = 'Accepted';
-            } else if ($response == FollowRequestResponse::Reject->value) {
+            } elseif ($response == FollowRequestResponse::Reject->value) {
                 $followerRequest->delete();
                 $process = 'Rejected';
             }
+
+            dd('bitti');
 
             return $this->apiSuccessResponse(null, Response::HTTP_OK, "request {$process} successfully");
         } catch (\Exception $exception) {
@@ -225,6 +224,6 @@ class UserController extends Controller
 
     public function createProfileImageName()
     {
-        return  str_replace('-', '_', Str::slug(auth()->user()->name)) . '_' . auth()->id();
+        return str_replace('-', '_', Str::slug(auth()->user()->name)).'_'.auth()->id();
     }
 }

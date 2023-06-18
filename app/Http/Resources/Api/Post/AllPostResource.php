@@ -2,10 +2,10 @@
 
 namespace App\Http\Resources\Api\Psot;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\Api\Comment\CommentResource;
 use App\Http\Resources\Api\User\UserResource;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class AllPostResource extends JsonResource
 {
@@ -21,8 +21,8 @@ class AllPostResource extends JsonResource
             'title' => $this->title,
             'descirption' => $this->description,
             'is_liked' => $this->resource->is_liked,
-            'user' =>new UserResource(auth()->user()),
-            'comments' =>CommentResource::collection($this->comments)
+            'user' => new UserResource(auth()->user()),
+            'comments' => CommentResource::collection($this->comments),
         ];
     }
 }

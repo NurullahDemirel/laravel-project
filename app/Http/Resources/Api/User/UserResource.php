@@ -18,7 +18,7 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
-            'profile_image' => $this->getFirstMedia('profile') ?  $this->getFirstMedia('profile')->getFullUrl() : ''
+            'profile_image' => $this->getFirstMedia('profile') ? $this->getFirstMedia('profile')->getFullUrl() : '',
         ];
     }
 }

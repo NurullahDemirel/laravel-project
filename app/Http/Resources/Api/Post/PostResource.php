@@ -4,7 +4,6 @@ namespace App\Http\Resources\Api\Post;
 
 use App\Http\Resources\Api\Comment\CommentResource;
 use Illuminate\Http\Request;
-use App\Http\Resources\Api\User\UserResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class PostResource extends JsonResource
@@ -21,7 +20,7 @@ class PostResource extends JsonResource
             'title' => $this->title,
             'descirption' => $this->description,
             'is_liked' => $this->resource->is_liked,
-            'comments' =>CommentResource::collection($this->comments)
+            'comments' => CommentResource::collection($this->comments),
         ];
     }
 }

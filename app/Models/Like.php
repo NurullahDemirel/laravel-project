@@ -14,11 +14,12 @@ class Like extends Model
 
     //this consts data used for route structer
     public const LIKEABLE_TYPE_COMMENT = 'comment';
+
     public const LIKEABLE_TYPE_POST = 'post';
+
     public const LIKEABLE_TYPES = [self::LIKEABLE_TYPE_COMMENT, self::LIKEABLE_TYPE_POST];
 
     protected $appends = ['is_liked'];
-
 
     public function commentable()
     {
@@ -40,7 +41,8 @@ class Like extends Model
         return $this->morphMany(Like::class, 'likeable');
     }
 
-    public function getIsLikedAttribute(){
-        return $this->likes->contains('user_id',auth()->id()) ? 1 : 0;
+    public function getIsLikedAttribute()
+    {
+        return $this->likes->contains('user_id', auth()->id()) ? 1 : 0;
     }
 }

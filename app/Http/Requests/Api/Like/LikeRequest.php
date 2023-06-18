@@ -14,7 +14,7 @@ class LikeRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return !is_null(auth()->user());
+        return ! is_null(auth()->user());
     }
 
     /**
@@ -25,8 +25,8 @@ class LikeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'post_id' => Rule::when($this->has('post_id'),'required|exists:posts,id'),
-            'comment_id' => Rule::when($this->has('comment_id'),'required|exists:comments,id'),
+            'post_id' => Rule::when($this->has('post_id'), 'required|exists:posts,id'),
+            'comment_id' => Rule::when($this->has('comment_id'), 'required|exists:comments,id'),
             // 'action_type' => ['required',new Enum(LikeActions::class)]
         ];
     }

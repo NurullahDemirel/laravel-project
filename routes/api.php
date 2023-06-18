@@ -50,6 +50,3 @@ Route::get('auth/github/callback', [SocialiteController::class, 'loginWithGithub
 
 Route::get('auth/google/redirect', [SocialiteController::class, 'loginWithGoogleRedirect']);
 Route::get('auth/google/callback', [SocialiteController::class, 'loginWithGoogleCallback']);
-
-// //this route adde by testing some proccess in order to be sure , it should be delete end of the project
-// Route::get('test', [Controller::class, 'test']);

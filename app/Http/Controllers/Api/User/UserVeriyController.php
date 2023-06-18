@@ -18,9 +18,9 @@ class UserVeriyController extends Controller
         try {
             $user = User::where('code', $code)->first();
 
-            if (!$user) {
+            if (! $user) {
                 return response()->json([
-                    'error' => 'User not found'
+                    'error' => 'User not found',
                 ], Response::HTTP_NOT_FOUND);
             }
 
@@ -28,12 +28,12 @@ class UserVeriyController extends Controller
 
             return response()->json([
                 'error' => 0,
-                'message' => 'Email address was verified successfully'
+                'message' => 'Email address was verified successfully',
             ], Response::HTTP_OK);
 
         } catch (\Exception $e) {
             return response()->json([
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 400);
         }
 

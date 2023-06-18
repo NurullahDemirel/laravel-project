@@ -12,7 +12,7 @@ class UpdateCommentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return !is_null(auth()->user());
+        return ! is_null(auth()->user());
 
     }
 
@@ -23,10 +23,10 @@ class UpdateCommentRequest extends FormRequest
      */
     public function rules(): array
     {
-        return[
+        return [
             'content' => 'required|max:255',
             'post_id' => 'required|exists,posts,id',
-            'parent_id' =>  Rule::when($this->has('parent_id'),'required|exists,users,id')
+            'parent_id' => Rule::when($this->has('parent_id'), 'required|exists,users,id'),
         ];
     }
 }

@@ -11,12 +11,13 @@ use Illuminate\Validation\Rules\Enum;
 class ResponseFollowerRequest extends FormRequest
 {
     use ApiTrait;
+
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return !is_null(auth()->user());
+        return ! is_null(auth()->user());
     }
 
     /**
@@ -28,7 +29,7 @@ class ResponseFollowerRequest extends FormRequest
     {
         return [
             'follow_request_id' => 'required|exists:followers,id',
-            'response' => ['required', new Enum(FollowRequestResponse::class)]
+            'response' => ['required', new Enum(FollowRequestResponse::class)],
         ];
     }
 

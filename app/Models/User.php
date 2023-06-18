@@ -9,11 +9,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
-
 use Qirolab\Laravel\Reactions\Contracts\ReactsInterface;
 use Qirolab\Laravel\Reactions\Traits\Reacts;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
 class User extends Authenticatable implements HasMedia, MustVerifyEmail, ReactsInterface
 {
@@ -63,7 +62,6 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail, ReactsI
         return $this->hasMany(Post::class, 'user_id', 'id');
     }
 
-
     public function comments()
     {
         return $this->hasMany(Comment::class, 'user_id', 'id');
@@ -73,6 +71,7 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail, ReactsI
     {
         return $this->hasMany(Like::class, 'user_id', 'id');
     }
+
     public function postIFollow()
     {
         return $this->belongsToMany(

@@ -16,8 +16,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('', function () {
-});
+
 
 Route::get('/test', function () {
+    dd($url = Storage::disk('s3')->url('emojis/0023-FE0F-20E3.png'));
 });

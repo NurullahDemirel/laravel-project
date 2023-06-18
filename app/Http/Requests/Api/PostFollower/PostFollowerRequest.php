@@ -3,18 +3,19 @@
 namespace App\Http\Requests\Api\PostFollower;
 
 use App\Traits\ApiTrait;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 
 class PostFollowerRequest extends FormRequest
 {
     use ApiTrait;
+
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return !is_null(auth()->user());
+        return ! is_null(auth()->user());
     }
 
     /**
@@ -25,7 +26,7 @@ class PostFollowerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'post_id' => 'required|exists:posts,id'
+            'post_id' => 'required|exists:posts,id',
         ];
     }
 

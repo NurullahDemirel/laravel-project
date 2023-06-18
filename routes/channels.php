@@ -18,9 +18,5 @@ Broadcast::channel('requestResponse', function () {
 });
 
 Broadcast::channel('privateChannel', function () {
-        return true;
+    return true;
 });
-
-
-
-Broadcast::routes(['middleware' => 'auth:sanctum']);

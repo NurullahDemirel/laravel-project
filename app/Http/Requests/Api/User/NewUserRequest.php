@@ -5,9 +5,11 @@ namespace App\Http\Requests\Api\User;
 use App\Traits\ApiTrait;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+
 class NewUserRequest extends FormRequest
 {
     use ApiTrait;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -30,7 +32,6 @@ class NewUserRequest extends FormRequest
             'repeat_password' => 'required|same:password',
         ];
     }
-
 
     public function failedValidation(Validator $validator)
     {

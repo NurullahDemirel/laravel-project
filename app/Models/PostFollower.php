@@ -9,15 +9,17 @@ class PostFollower extends Model
 {
     use HasFactory;
 
-    protected $guarded = [] ;
-    protected $with = ['user'] ;
+    protected $guarded = [];
 
-    public function post(){
-        return $this->belongsTo(Post::class,'post_id');
+    protected $with = ['user'];
+
+    public function post()
+    {
+        return $this->belongsTo(Post::class, 'post_id');
     }
 
     public function user()
     {
-        return $this->belongsTo(User::class,'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

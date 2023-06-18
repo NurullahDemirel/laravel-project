@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 class CommentController extends Controller
 {
     use ApiTrait;
+
     /**
      * Display a listing of the resource.
      */
@@ -23,6 +24,7 @@ class CommentController extends Controller
 
         try {
             $comments = Comment::myComments()->with(['post', 'likes'])->get();
+
             return $this->apiSuccessResponse(['comments' => CommentResource::collection($comments)]);
         } catch (\Exception $e) {
             return $this->exceptionResponse($e);
@@ -85,8 +87,7 @@ class CommentController extends Controller
                 $comment->delete();
             });
 
-
-            return $this->apiSuccessResponse(null,Response::HTTP_OK,"Successfully deleted");
+            return $this->apiSuccessResponse(null, Response::HTTP_OK, 'Successfully deleted');
         } catch (\Exception $e) {
             return $this->exceptionResponse($e);
         }

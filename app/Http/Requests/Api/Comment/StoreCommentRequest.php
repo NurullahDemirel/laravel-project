@@ -12,7 +12,7 @@ class StoreCommentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return !is_null(auth()->user());
+        return ! is_null(auth()->user());
     }
 
     /**
@@ -25,7 +25,7 @@ class StoreCommentRequest extends FormRequest
         return [
             'content' => 'required|max:255',
             'post_id' => 'required|exists:posts,id',
-            'parent_id' =>  Rule::when($this->has('parent_id'),'required|exists:comments,id')
+            'parent_id' => Rule::when($this->has('parent_id'), 'required|exists:comments,id'),
         ];
     }
 }

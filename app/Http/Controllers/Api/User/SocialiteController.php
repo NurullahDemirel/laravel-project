@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\User;
 
 use App\Enums\LoginWith;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\User;
 use App\Traits\ApiTrait;
 use Hash;
@@ -14,7 +13,6 @@ use Laravel\Socialite\Facades\Socialite;
 class SocialiteController extends Controller
 {
     use ApiTrait;
-
 
     public function loginWithGithubRedirect()
     {
@@ -43,7 +41,7 @@ class SocialiteController extends Controller
                     'name' => $userName,
                     'auth_type' => LoginWith::Github->value,
                     'email' => $usermail,
-                    'password' => Hash::make($usermail)
+                    'password' => Hash::make($usermail),
                 ]);
                 $token = $user->createToken('myApp')->plainTextToken;
             }
@@ -54,12 +52,12 @@ class SocialiteController extends Controller
         }
     }
 
-
     public function loginWithGoogleRedirect()
     {
 
         try {
             $url = Socialite::driver('google')->stateless()->redirect()->getTargetUrl();
+
             return $this->apiSuccessResponse(['redirect_url' => $url], Response::HTTP_OK, 'Redirect url get successfully');
         } catch (\Exception  $exception) {
             return $this->exceptionResponse($exception);
@@ -82,7 +80,7 @@ class SocialiteController extends Controller
                     'name' => $userName,
                     'auth_type' => LoginWith::Github->value,
                     'email' => $usermail,
-                    'password' => Hash::make($usermail)
+                    'password' => Hash::make($usermail),
                 ]);
                 $token = $user->createToken('myApp')->plainTextToken;
             }
